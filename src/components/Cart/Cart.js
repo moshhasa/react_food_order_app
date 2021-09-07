@@ -10,12 +10,13 @@ const Cart = ({ onHide }) => {
   const showOrderButton = context.items.length > 0;
 
   const addCartItemHandler = (item) => {
-    context.addItem(item);
+    context.addItem({...item, amount : 1});
   };
 
   const removeCartItemHandler = (itemId) => {
     context.removeItem(itemId);
   };
+  
   return (
     <Modal onHide={onHide}>
       <ul className={styles["cart-items"]}>
