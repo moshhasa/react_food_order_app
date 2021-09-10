@@ -1,49 +1,40 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import useHttp from "../../hook/use-http";
 import Card from "../UI/Card/Card";
 import styles from "./AvailableMeals.module.css";
 import MealItem from "./MealItem/MealItem";
 
-const DUMMY_MEALS = [
-  {
-    id: "m1",
-    name: "Sushi",
-    description: "Finest fish and veggies",
-    price: 22.99,
-  },
-  {
-    id: "m2",
-    name: "Schnitzel",
-    description: "A german specialty!",
-    price: 16.5,
-  },
-  {
-    id: "m3",
-    name: "Barbecue Burger",
-    description: "American, raw, meaty",
-    price: 12.99,
-  },
-  {
-    id: "m4",
-    name: "Green Bowl",
-    description: "Healthy...and green...",
-    price: 18.99,
-  },
-];
-
 const AvailableMeals = () => {
-  return (
-    <section className={styles.meals}>
-      <Card>
-        <ul>
-          {DUMMY_MEALS.map((meal) => (
-            <li key={meal.id}>
-                <MealItem  meal={meal} />
-            </li>
-          ))}
-        </ul>
-      </Card>
-    </section>
-  );
+  const [meals, setMeals] = useState([]);
+  const { isLoading, error, sendRequest: fetchMeals } = useHttp();
+
+  useEffect(() => {
+    fetchMeals({ url: "http://localhost:8085/meals" }, (m) => setMeals(m));
+  }, [fetchMeals]);
+
+  let content = <p>No meals available</p>;
+
+  if (isLoading) {
+    content = <section className={styles['meals-loading']}> <p>Loading...</p> </section>;
+  } else if (error) {
+    content =<section className={styles['meals-error']}> <p>{error}</p> </section>;
+  } else {
+    content = (
+      <section className={styles.meals}>
+        <Card>
+          <ul>
+            {meals.map((meal) => (
+              <li key={meal.id}>
+                <MealItem meal={meal} />
+              </li>
+            ))}
+          </ul>
+        </Card>
+      </section>
+    );
+  }
+
+  return content;
 };
 
 export default AvailableMeals;
